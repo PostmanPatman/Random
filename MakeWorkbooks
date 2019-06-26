@@ -1,0 +1,40 @@
+Option Explicit
+
+Sub ExportAsPDF()
+
+Dim i As Integer
+Dim FolderName As String
+Dim FolderPath As String
+
+FolderName = InputBox("Please enter a name for the folder", "Enter folder name")
+
+If FolderName = "" Then
+    MsgBox "You did not enter a name for the folder"
+    Exit Sub
+End If
+
+FolderPath = "C:\Users\Trainee1\Desktop\" & FolderName
+
+On Error GoTo ErrorHandler
+MkDir FolderPath
+On Error GoTo 0
+
+For i = 1 To Worksheets.Count
+
+    Worksheets(i).ExportAsFixedFormat Type:=xlTypePDF, Filename:=FolderPath & "\" & _
+        Worksheets(i).Name, openafterpublish:=False
+        
+Next
+
+MsgBox "All PDF's have been saved"
+
+Exit Sub
+
+ErrorHandler:
+
+    If Err.Number = 75 Then
+        MsgBox "That folder already exists. Please try a different folder name."
+        Exit Sub
+    End If
+
+End Sub
