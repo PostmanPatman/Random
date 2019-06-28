@@ -1,61 +1,86 @@
-Option Explicit
+Sub MakeMyFolder()
 
-Sub ExportAsPDF()
+    'Dimensions
+    Dim fdObj As Object
+    Dim user As String
+    Dim i As Integer
+    Dim FolderName As String
+    Dim FolderPath As String
+    Dim wb As Workbook
+    Dim sh1 As Worksheet
+    Dim sh2 As Worksheet
+    Dim lr As Long
+    Dim rng As Range
+    Dim xRg As Range
+    Dim fname As String
+    Dim Nwb As Worksheet
+    Dim Destwb As Workbook
+    Dim NewFile As String
+    Dim nFileName As String
+            
+    'performance improvement
+    Application.ScreenUpdating = False
+        
+    'setup section
+    user = Application.UserName
+    Set fdObj = CreateObject("Scripting.FileSystemObject")
+    Set wb = ActiveWorkbook
+    Set sh1 = wb.Sheets("Sheet1")
+    Set sh2 = wb.Sheets("Sheet2")
+    lr = sh2.Range("A1").CurrentRegion.Rows.Count
+    Set rng = sh2.Range("A1:A" & lr)
+    
+    'Folder name
+    FolderName = InputBox("Please enter a name for the folder", "Enter folder name")
 
-Dim i As Integer
-Dim FolderName As String
-Dim FolderPath As String
-
-FolderName = InputBox("Please enter a name for the folder", "Enter folder name")
-
+'checks for blank folder name
 If FolderName = "" Then
     MsgBox "You did not enter a name for the folder"
     Exit Sub
 End If
-
-FolderPath = "C:\Users\Trainee1\Desktop\" & FolderName
-
-On Error GoTo ErrorHandler
-MkDir FolderPath
-On Error GoTo 0
-
-For i = 1 To Worksheets.Count
-
-    Worksheets(i).ExportAsFixedFormat Type:=xlTypePDF, Filename:=FolderPath & "\" & _
-        Worksheets(i).Name, openafterpublish:=False
         
-Next
+    'FolderPath
+    FolderPath = "C:\Users\" & user & "\Desktop\" & FolderName
 
-MsgBox "All PDF's have been saved"
-
-Exit Sub
-
-ErrorHandler:
-
-    If Err.Number = 75 Then
-        MsgBox "That folder already exists. Please try a different folder name."
-        Exit Sub
+    'checks if the folder exists if not creates a new folder
+    If fdObj.FolderExists(FolderPath) Then
+        MsgBox "Folder already exists.", vbInformation, "Folder Information"
+    Else
+        fdObj.CreateFolder (FolderPath)
+        MsgBox "Folder has been created.", vbInformation, "Folder Information"
     End If
 
-End Sub
+'Create New Sheets
+For Each xRg In rng
+        With wb
+            .Sheets.Add after:=.Sheets(.Sheets.Count)
+            On Error Resume Next
+            ActiveSheet.Name = Left(xRg.Value, 30)
+            If Err.Number = 1004 Then
+              Debug.Print xRg.Value & " already used as a sheet name"
+            End If
+            On Error GoTo 0
+        End With
+    Next xRg
 
-Sub AddWorksheetsFromSelection()
-    Dim CurSheet As Worksheet
-    Dim Source As Range
-    Dim c As Range
+'Moves data from source to sheet with same name
 
-    Set CurSheet = ActiveSheet
-    Set Source = Selection.Cells
-    Application.ScreenUpdating = False
 
-    For Each c In Source
-        sName = Trim(c.Text)
-        If Len(sName) > 0 Then
-                Worksheets.Add After:=Worksheets(Worksheets.Count)
-                ActiveSheet.Name = sName
-        End If
-    Next c
+'Creates new worbooks
+Set Nwb = wb.Sheets("ARRM Calgary 1")
+nFileName = Nwb.Name
 
-    CurSheet.Activate
+'File Name
+NewFile = FolderPath & "\" & nFileName & ".xlsx"
+
+'Save sheet as Workbook
+Workbooks.Add
+ActiveWorkbook.SaveAs Filename:=NewFile
+Set Destwb = ActiveWorkbook
+    
+'returns to normal
     Application.ScreenUpdating = True
+    
 End Sub
+
+
