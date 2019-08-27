@@ -1,0 +1,70 @@
+
+
+
+    ' Check to see if there's an explorer window open
+    ' If not then open up a new one
+    OutOpen = True
+    Set myExplorer = OlApp.ActiveExplorer
+    If TypeName(myExplorer) = "Nothing" Then
+        OutOpen = False
+        Set myNameSp = OlApp.GetNamespace("MAPI")
+        Set myInbox = myNameSp.GetDefaultFolder(olFolderInbox)
+        Set myExp
+		
+
+
+    Dim Body As String
+    
+                Body = "Matrix employee " & UserName & " submitted their July 2019 benefit enrolment information to the Benefits Renewal Server with the following selections:" & vbCrLf & vbCrLf
+                Body = Body & "<br>"
+                Body = Body & "<br>"
+                Body = Body & "<table border=1>"
+                Body = Body & "<tr><td>Plan Option:</td><td>" & planOption & "</td></tr>"
+                Body = Body & "<tr><td>Dependent Status:</td><td>" & coverageType & "</td></tr>"
+                Body = Body & "<tr><td>Health and Dental Coverage:</td><td>" & HDCoverage & "</td></tr>"
+                Body = Body & "<tr><td>Basic Life and AD&D Factor:</td><td>" & LifeADDFactor & "</td></tr>"
+                Body = Body & "<tr><td>Dependent Life Factor:</td><td>" & DepLife & "</td></tr>"
+                'Body = Body & "<tr><td>Employee Level:</td><td>" & employeeLevel & "</td></tr>"
+                Body = Body & "<tr><td>Flex Health Spending Account Allocation:</td><td>" & "$" & flexHSA & "</td></tr>"
+                Body = Body & "<tr><td>Flex Personal Spending Account Allocation:</td><td>" & "$" & flexPSA & "</td></tr>"
+                Body = Body & "<tr><td>Flex RRSP Contribution: </td><td>" & "$" & flexRRSP & "</td></tr>"
+                Body = Body & "<tr><td>Flex TFSA Contribution:</td><td>" & "$" & flexTFSA & "</td></tr>"
+                Body = Body & "<tr><td>Flex Hours Purchased: </td><td>" & "$" & flexHrsDollars & "</td></tr>"
+                'Body = Body & "<tr><td>Flex Hours: </td><td>" & flexHrsPur & "</td></tr>"
+                Body = Body & "</table>"
+                Body = Body & "<br>"
+                Body = Body & "To change your allocations, modify your selections on the calculator and click submit." & vbCrLf & vbCrLf
+                Body = Body & "<br>"
+                Body = Body & "<br>"
+                Body = Body & "Please contact Benefits@matrix-solutions.com if you have benefit related questions." & vbCrLf & vbCrLf
+
+
+
+
+
+    ' Create a new mail message item.
+    Set NewMail = OlApp.CreateItem(olMailItem)
+    With NewMail
+        '.Display ' You don't have to show the e-mail to send it
+        .Subject = "July 2019 Benefits Renewal Information for " & UserName
+        '.To = "nsontag@matrix-solutions.com"
+        .To = UserName & "@matrix-solutions.com"
+        '.CC = "benefits@matrix-solutions.com; payroll@matrix-solutions.com" 'for early enrolment only
+        '.CC = "benefits@matrix-solutions.com" 'deactivated as we dont need to see this email.
+    
+        .HTMLBody = Body
+        
+                End With
+
+    NewMail.Send
+    If Not OutOpen Then OlApp.Quit
+
+ 'Release memory.
+    Set OlApp = Nothing
+    Set myNameSp = Nothing
+    Set myInbox = Nothing
+    Set myExplorer = Nothing
+    Set NewMail = Nothing
+   
+
+
