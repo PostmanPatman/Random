@@ -1,0 +1,28 @@
+Sub GetFName()
+    
+    'Dimensions
+    Dim wb As Workbook
+    Dim sh As Worksheet
+    Dim WSHnet As Object
+    Dim UserName As String
+    Dim UserDomain As String
+    Dim UserFullName As String
+    Dim objUser As Object
+    Dim FName As String
+    
+    'Setup
+    Set wb = ActiveWorkbook
+    Set sh = wb.Sheets("Sheet1")
+    Set WSHnet = CreateObject("WScript.Network")
+    UserName = WSHnet.UserName
+    UserDomain = WSHnet.UserDomain
+    Set objUser = GetObject("WinNT://" & UserDomain & "/" & UserName & ",user")
+    UserFullName = objUser.FullName
+    FName = Left(UserFullName, Application.WorksheetFunction.Search(" ", UserFullName) - 1)
+        
+    'Ouput
+    sh.Range("A1").Value = FName
+    MsgBox "The Name is: " & vbCrLf & vbCrLf & FName, vbInformation, "Ouput"
+    
+
+End Sub
