@@ -1,0 +1,399 @@
+Sub MakeLetter()
+
+' Set up variables
+
+'Workbook and Worksheets
+ Dim wb As Workbook
+ Dim ws As Worksheet
+ Dim ws1 As Worksheet
+  
+ Set wb = ActiveWorkbook
+ Set ws = Sheets("TERM WORKSHEET")
+ Set ws1 = Sheets("Lookups")
+ 
+ 'Other dimensions such as filepath a Word Objs
+ Dim objword As Object
+ Dim objDoc As Object
+ Dim fd As FileDialog
+ Dim sfolder As String
+ Dim docName As Variant
+ Dim FilePath As String
+ Dim FileCk As String
+ Dim i As Integer
+ Dim LetType As String
+  
+'Assign dims
+  
+Set objword = CreateObject("Word.Application")
+objword.Visible = True
+i = 0
+LetType = ws.Range("B33")
+
+'Dims for cell references
+
+Dim EmpID As String
+Dim Name As String
+Dim TotalSev As Variant
+Dim DyProv As String
+Dim PIL As String
+Dim PILAmt As Variant
+Dim TrmDt As Date
+Dim PILDt As Date
+Dim PILWk As String
+Dim HRBPNm As String
+Dim HRBpEmail As String
+Dim PrpDO As String
+Dim OffCnt As String
+Dim EmpAgr As Date
+Dim LetDate As Date
+Dim EmpAdd As String
+Dim AKANm As String
+Dim SevAmt As Variant
+Dim SevWk As String
+Dim LeadNm As String
+Dim LeadTit As String
+Dim FctDys As String
+
+'Assign Cell references for Bookmarks
+EmpID = ws.Range("B4")
+Name = ws.Range("B5")
+TotalSev = ws.Range("B54")
+DyProv = ws.Range("B9")
+PIL = ws.Range("B36")
+PILAmt = ws.Range("B40")
+TrmDt = ws.Range("B19")
+PILDt = DateAdd("ww", PIL, TrmDt)
+PILWk = ws.Range("B36")
+HRBPNm = ws.Range("B64")
+HRBpEmail = ws.Range("B65")
+PrpDO = ws.Range("B66")
+OffCnt = ws.Range("B67")
+EmpAgr = ws.Range("B27")
+LetDate = Date
+EmpAdd = ws1.Range("AA2") & vbNewLine & ws1.Range("AB2") & ", " & ws1.Range("AC2") & vbNewLine & ws1.Range("AD2")
+AKANm = ws.Range("C5")
+SevAmt = ws.Range("B49")
+SevWk = WorksheetFunction.Max(ws.Range("B47:B48"))
+LeadNm = ws.Range("B61") & ", " & ws.Range("B63")
+LeadTit = ws.Range("B62")
+FctDys = ws1.Range("Z2")
+
+' Prompt
+MsgBox "Pick a Folder to Save Documents", vbExclamation, "Save Files"
+Application.ScreenUpdating = False
+
+'Create a FileDialog object as a Folder Picker dialog box.
+Set fd = Application.FileDialog(msoFileDialogFolderPicker)
+
+'Assigns the folder location
+With fd
+    If .Show = -1 Then
+        sfolder = .SelectedItems(1)
+    End If
+End With
+
+'if no folder is picked it will not run
+If sfolder <> "" Then
+
+'Sets the file name for saving
+docName = "\" & "Severance Payment Option Form " & Name
+
+'checks if the file exists already
+FilePath = sfolder & docName & ".docx"
+FileCk = ""
+FileCk = Dir(FilePath, vbNormal)
+
+If FileCk = "" Then
+    Else
+        MsgBox "File Already Exists"
+        Exit Sub
+End If
+End If
+
+' Prompt
+MsgBox "Generating " & Right(docName, Len(docName) - 1), vbExclamation, "Word is Running ..."
+Application.ScreenUpdating = False
+
+'Copy to word
+  Set objDoc = objword.Documents.Add("H:\Employee Relations\Terminations\+Documentation\+Package\Severance Payment Option Form - Hired in 1996 or after.docx")   'The link to the file
+  
+  With objDoc
+  .bookmarks("PayOptEmp").Range.Text = EmpID
+  .bookmarks("PayOptName").Range.Text = Name
+  .bookmarks("PayOptSev").Range.Text = "$" & Format(SevAmt, "#,##0.00")
+End With
+
+objDoc.SaveAs FilePath
+Set objDoc = Nothing
+i = i + 1
+
+  ' Dim Shex As Object
+  ' Set Shex = CreateObject("Shell.Application")
+  ' tgtfile = FilePath
+  ' Shex.Open (tgtfile)
+  
+'Starts the next document
+
+'Sets the file name for saving
+docName = "\" & "Fact Sheet " & Name
+
+'checks if the file exists already
+FilePath = sfolder & docName & ".docx"
+FileCk = ""
+FileCk = Dir(FilePath, vbNormal)
+
+If FileCk = "" Then
+    Else
+        MsgBox "File Already Exists"
+        Exit Sub
+End If
+
+' Prompt
+MsgBox "Generating " & Right(docName, Len(docName) - 1), vbExclamation, "Word is Running ..."
+Application.ScreenUpdating = False
+
+'Copy to word
+  Set objDoc = objword.Documents.Add("H:\Employee Relations\Terminations\+Documentation\+Package\Fact Sheet.docx")   'The link to the file
+  
+  With objDoc
+  .bookmarks("FctSh1").Range.Text = DyProv
+  .bookmarks("FctSh2").Range.Text = PIL
+  .bookmarks("FctSh3").Range.Text = Format(PILDt, "mmmm d, yyyy")
+  .bookmarks("FctSh4").Range.Text = HRBPNm
+  .bookmarks("FctSh5").Range.Text = HRBpEmail
+  .bookmarks("FctSh6").Range.Text = HRBPNm
+  .bookmarks("FctSh7").Range.Text = HRBPNm
+  .bookmarks("FctSh8").Range.Text = PrpDO
+  .bookmarks("FctSh9").Range.Text = OffCnt
+  .bookmarks("FctSh10").Range.Text = FctDys
+End With
+
+objDoc.SaveAs FilePath
+Set objDoc = Nothing
+i = i + 1
+
+'Starts the next document
+
+'Sets the file name for saving
+docName = "\" & "Release " & Name
+
+'checks if the file exists already
+FilePath = sfolder & docName & ".docx"
+FileCk = ""
+FileCk = Dir(FilePath, vbNormal)
+
+If FileCk = "" Then
+    Else
+        MsgBox "File Already Exists"
+        Exit Sub
+End If
+
+' Prompt
+MsgBox "Generating " & Right(docName, Len(docName) - 1), vbExclamation, "Word is Running ..."
+Application.ScreenUpdating = False
+
+'Copy to word
+  Set objDoc = objword.Documents.Add("H:\Employee Relations\Terminations\+Documentation\+Package\Release.docx")   'The link to the file
+  
+  With objDoc
+  .bookmarks("Rel1").Range.Text = Name
+  .bookmarks("Rel2").Range.Text = Name
+  .bookmarks("Rel3").Range.Text = Format(TrmDt, "mmmm d, yyyy")
+  .bookmarks("Rel4").Range.Text = Name
+  .bookmarks("Rel5").Range.Text = Name
+  .bookmarks("Rel6").Range.Text = UCase(Name)
+  .bookmarks("Rel7").Range.Text = Name
+  .bookmarks("Rel8").Range.Text = "$" & Format(SevAmt, "#,##0.00")
+  .bookmarks("Rel9").Range.Text = Name
+  .bookmarks("Rel10").Range.Text = Name
+  .bookmarks("Rel11").Range.Text = Format(EmpAgr, "mmmm d, yyyy")
+  .bookmarks("Rel12").Range.Text = DyProv
+  .bookmarks("Rel13").Range.Text = DyProv
+  .bookmarks("Rel14").Range.Text = DyProv
+  .bookmarks("Rel15").Range.Text = DyProv
+  .bookmarks("Rel16").Range.Text = DyProv
+  .bookmarks("Rel17").Range.Text = DyProv
+  .bookmarks("Rel18").Range.Text = DyProv
+  .bookmarks("Rel19").Range.Text = DyProv
+  .bookmarks("Rel20").Range.Text = DyProv
+  .bookmarks("Rel21").Range.Text = DyProv
+  .bookmarks("Rel22").Range.Text = Format(EmpAgr, "mmmm d, yyyy")
+  .bookmarks("Rel23").Range.Text = DyProv
+  .bookmarks("Rel24").Range.Text = Name
+End With
+
+objDoc.SaveAs FilePath
+Set objDoc = Nothing
+i = i + 1
+
+'Starts the next document for the letters uses logic for the letter type
+
+If LetType = "Letter A - Term Clause" Then
+    
+'Letter A Stuff goes here
+'Starts the next document
+
+'Sets the file name for saving
+docName = "\" & "Letter " & Name
+
+'checks if the file exists already
+FilePath = sfolder & docName & ".docx"
+FileCk = ""
+FileCk = Dir(FilePath, vbNormal)
+
+If FileCk = "" Then
+    Else
+        MsgBox "File Already Exists"
+        Exit Sub
+End If
+
+' Prompt
+MsgBox "Generating " & Right(docName, Len(docName) - 1), vbExclamation, "Word is Running ..."
+Application.ScreenUpdating = False
+
+'Copy to word
+  Set objDoc = objword.Documents.Add("H:\Employee Relations\Terminations\+Documentation\+Package\Letter A - Employment Agreement Term Clause.docx")   'The link to the file
+  
+  With objDoc
+  .bookmarks("LetA1").Range.Text = Format(TrmDt, "mmmm d, yyyy")
+  .bookmarks("LetA2").Range.Text = Name
+  .bookmarks("LetA3").Range.Text = EmpAdd
+  .bookmarks("LetA4").Range.Text = "$" & Format(PILAmt, "#,##0.00")
+  .bookmarks("LetA5").Range.Text = PILWk
+  .bookmarks("LetA6").Range.Text = Format(TrmDt, "mmmm d, yyyy")
+  .bookmarks("LetA7").Range.Text = Format(EmpAgr, "mmmm d, yyyy")
+  .bookmarks("LetA8").Range.Text = "$" & Format(SevAmt, "#,##0.00")
+  .bookmarks("LetA9").Range.Text = SevWk
+  .bookmarks("LetA10").Range.Text = Format(TrmDt, "mmmm d, yyyy")
+  .bookmarks("LetA11").Range.Text = Format(PILDt, "mmmm d, yyyy")
+  .bookmarks("LetA12").Range.Text = HRBPNm & ", " & HRBpEmail
+  .bookmarks("LetA13").Range.Text = HRBPNm
+  .bookmarks("LetA14").Range.Text = PILWk
+  .bookmarks("LetA15").Range.Text = LeadNm
+  .bookmarks("LetA16").Range.Text = LeadTit
+  .bookmarks("LetA17").Range.Text = Name
+  .bookmarks("LetA18").Range.Text = FctDys
+  .bookmarks("LetA19").Range.Text = AKANm
+End With
+
+objDoc.SaveAs FilePath
+Set objDoc = Nothing
+i = i + 1
+    
+ElseIf LetType = "Letter B - Term Plus" Then
+
+'Letter B stuff goes here
+
+'Starts the next document
+
+'Sets the file name for saving
+docName = "\" & "Letter " & Name
+
+'checks if the file exists already
+FilePath = sfolder & docName & ".docx"
+FileCk = ""
+FileCk = Dir(FilePath, vbNormal)
+
+If FileCk = "" Then
+    Else
+        MsgBox "File Already Exists"
+        Exit Sub
+End If
+
+' Prompt
+MsgBox "Generating " & Right(docName, Len(docName) - 1), vbExclamation, "Word is Running ..."
+Application.ScreenUpdating = False
+
+'Copy to word
+  Set objDoc = objword.Documents.Add("H:\Employee Relations\Terminations\+Documentation\+Package\Letter B Employment Agreement Term Plus.docx")   'The link to the file
+  
+  With objDoc
+  .bookmarks("LetB1").Range.Text = Format(TrmDt, "mmmm d, yyyy")
+  .bookmarks("LetB2").Range.Text = Name
+  .bookmarks("LetB3").Range.Text = EmpAdd
+  .bookmarks("LetB4").Range.Text = AKANm
+  .bookmarks("LetB5").Range.Text = DyProv
+  .bookmarks("LetB6").Range.Text = "$" & Format(PILAmt, "#,##0.00")
+  .bookmarks("LetB7").Range.Text = PILWk
+  .bookmarks("LetB8").Range.Text = Format(TrmDt, "mmmm d, yyyy")
+  .bookmarks("LetB9").Range.Text = Format(EmpAgr, "mmmm d, yyyy")
+  .bookmarks("LetB10").Range.Text = "$" & Format(SevAmt, "#,##0.00")
+  .bookmarks("LetB11").Range.Text = SevWk
+  .bookmarks("LetB12").Range.Text = Format(TrmDt, "mmmm d, yyyy")
+  .bookmarks("LetB13").Range.Text = Format(PILDt, "mmmm d, yyyy")
+  .bookmarks("LetB14").Range.Text = HRBPNm & ", " & HRBpEmail
+  .bookmarks("LetB15").Range.Text = HRBPNm
+  .bookmarks("LetB16").Range.Text = PILWk
+  .bookmarks("LetB17").Range.Text = DyProv
+  .bookmarks("LetB18").Range.Text = LeadNm
+  .bookmarks("LetB19").Range.Text = LeadTit
+  .bookmarks("LetB20").Range.Text = Name
+  .bookmarks("LetB21").Range.Text = FctDys
+End With
+
+objDoc.SaveAs FilePath
+Set objDoc = Nothing
+i = i + 1
+
+Else:
+
+' Letter C stuff goes here
+
+'Starts the next document
+
+'Sets the file name for saving
+docName = "\" & "Letter " & Name
+
+'checks if the file exists already
+FilePath = sfolder & docName & ".docx"
+FileCk = ""
+FileCk = Dir(FilePath, vbNormal)
+
+If FileCk = "" Then
+    Else
+        MsgBox "File Already Exists"
+        Exit Sub
+End If
+
+' Prompt
+MsgBox "Generating " & Right(docName, Len(docName) - 1), vbExclamation, "Word is Running ..."
+Application.ScreenUpdating = False
+
+'Copy to word
+  Set objDoc = objword.Documents.Add("H:\Employee Relations\Terminations\+Documentation\+Package\Letter C - No Employment Agreement.docx")   'The link to the file
+  
+  With objDoc
+  .bookmarks("LetC1").Range.Text = Format(TrmDt, "mmmm d, yyyy")
+  .bookmarks("LetC2").Range.Text = Name
+  .bookmarks("LetC3").Range.Text = EmpAdd
+  .bookmarks("LetC4").Range.Text = AKANm
+  .bookmarks("LetC5").Range.Text = DyProv
+  .bookmarks("LetC6").Range.Text = "$" & Format(PILAmt, "#,##0.00")
+  .bookmarks("LetC7").Range.Text = PILWk
+  .bookmarks("LetC8").Range.Text = Format(TrmDt, "mmmm d, yyyy")
+  .bookmarks("LetC9").Range.Text = "$" & Format(SevAmt, "#,##0.00")
+  .bookmarks("LetC10").Range.Text = SevWk
+  .bookmarks("LetC11").Range.Text = Format(TrmDt, "mmmm d, yyyy")
+  .bookmarks("LetC12").Range.Text = Format(PILDt, "mmmm d, yyyy")
+  .bookmarks("LetC13").Range.Text = HRBPNm & ", " & HRBpEmail
+  .bookmarks("LetC14").Range.Text = HRBPNm
+  .bookmarks("LetC15").Range.Text = PILWk
+  .bookmarks("LetC16").Range.Text = DyProv
+  .bookmarks("LetC17").Range.Text = LeadNm
+  .bookmarks("LetC18").Range.Text = LeadTit
+  .bookmarks("LetC19").Range.Text = Name
+   .bookmarks("LetC20").Range.Text = FctDys
+End With
+
+objDoc.SaveAs FilePath
+Set objDoc = Nothing
+i = i + 1
+
+End If
+
+
+' Prompt
+MsgBox "Process is Complete Word made " & i & " Documents", vbExclamation
+Application.ScreenUpdating = False
+
+End Sub
